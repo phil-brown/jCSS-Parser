@@ -29,9 +29,7 @@ public interface ParserConstants
 			                DISABLED = 25,
 			                CHECKED = 26,
 			                NOT = 27,
-			                SELECTION = 28,
-			                FONT_FACE = 29,
-			                KEYFRAMES = 30;
+			                SELECTION = 28;
 	
 	//Room here for more keywords
 	
@@ -82,7 +80,7 @@ public interface ParserConstants
 	public static final String[] RESERVEDWORD = {"","link","visited","active","hover",
         "focus","first-letter","first-line","first-child","before","after","lang","first-of-type","last-of-type","only-of-type",
         "only-child","nth-child","nth-last-child","nth-of-type","nth-last-of-type","last-child","root","empty","target",
-        "enabled","disabled","checked","not","selection", "font-face", "keyframes"};
+        "enabled","disabled","checked","not","selection"};
 
 	public static final boolean DEBUG = false;
 }

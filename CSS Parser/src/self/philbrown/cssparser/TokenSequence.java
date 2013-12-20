@@ -45,6 +45,7 @@ public class TokenSequence
 		
 		public Builder append(Token t)
 		{
+			System.out.print(t.toString());
 			tokens.add(t);
 			builder.append(t.toString());
 			return this;

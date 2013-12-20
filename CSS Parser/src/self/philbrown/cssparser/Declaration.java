@@ -1,5 +1,7 @@
 package self.philbrown.cssparser;
 
+import java.util.Locale;
+
 /**
  * Includes a property and value. May be marked as important.
  * @author Phil Brown
@@ -46,6 +48,12 @@ public class Declaration
 
 	public void setImportant(boolean important) {
 		this.important = important;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return String.format(Locale.US, "%s:%s%s", property.toString(), value.toString(), (important ? " !important" : ""));
 	}
 	
 }

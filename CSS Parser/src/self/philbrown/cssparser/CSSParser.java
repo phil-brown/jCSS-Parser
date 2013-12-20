@@ -14,8 +14,6 @@ public class CSSParser implements ParserConstants
 	
 	private CSSHandler handler;
 	
-	private int loopNumber = 0;
-	private int stringNumber = 0;
 	private int indent = 0;
 	
 	private boolean debug = false;
@@ -40,7 +38,7 @@ public class CSSParser implements ParserConstants
 			t = s.nextToken();
 		}
 		else {
-			System.err.println("Match Error: " + matcher + " needed. Found: " + t.toString());
+			handler.handleError(String.format(Locale.US, "Match Error: %s needed. Found: %s.", new Token(matcher, null).toString(), t.toString()), new Exception("Matcher Error"));
 			System.exit(0);
 		}
 	}
@@ -78,9 +76,13 @@ public class CSSParser implements ParserConstants
 					}
 					String name = importString.toString();
 					InputStream is = handler.handleImport(name);
-					//FIXME: this doesn't allow multiple imports to import in the correct order
-					s.include(is, name);
-					t = s.nextToken();
+					if (is != null)
+					{
+						//FIXME: this doesn't allow multiple imports to import in the correct order
+						s.include(is, name);
+						t = s.nextToken();
+					}
+					
 				}
 				else if (identifier.equalsIgnoreCase("namespace"))
 				{
@@ -167,10 +169,11 @@ public class CSSParser implements ParserConstants
 									System.out.println(String.format(Locale.US, "Not a valid percentage: '%s'.", _percent));
 							}
 							match(LEFT_CURLY_BRACKET);
-							TokenSequence.Builder property = new TokenSequence.Builder();
+							
 							List<Declaration> declarations = new ArrayList<Declaration>();
 							while (t.tokenCode != RIGHT_CURLY_BRACKET)
 							{
+								TokenSequence.Builder property = new TokenSequence.Builder();
 								property.append(t);
 								match(IDENTIFIER);
 								match(COLON);
@@ -198,156 +201,77 @@ public class CSSParser implements ParserConstants
 				{
 					//get Typeface from handler
 					match(AT_RULE);
+					match(LEFT_CURLY_BRACKET);
+					List<Declaration> declarations = new ArrayList<Declaration>();
+					while(t.tokenCode != RIGHT_CURLY_BRACKET)
+					{
+						TokenSequence.Builder property = new TokenSequence.Builder();
+						property.append(t);
+						
+						match(IDENTIFIER);
+						match(COLON);
+						TokenSequence.Builder value = new TokenSequence.Builder();
+						while (t.tokenCode != RIGHT_CURLY_BRACKET && t.tokenCode != SEMICOLON)
+						{
+							value.append(t);
+						}
+						declarations.add(new Declaration(property.create(), value.create(), false));
+						t = s.nextToken();
+					}
+					match (RIGHT_CURLY_BRACKET);
+					try {
+						FontFace f = new FontFace(declarations);
+						handler.handleFontFace(f);
+					}
+					catch (Throwable t)
+					{
+						handler.handleError("Could not parse @font-face", t);
+						System.exit(0);
+					}
 					
 				}
 				else
 				{
-					match(AT_RULE);
+					handler.handleError(String.format(Locale.US, "This implementation does not support the at-rule %s.", t.toString()), new Exception("At-Rule not supported"));
+					System.exit(0);
 					//media, page, document don't really apply
 				}
 			}
 			else
 			{
-				//handleAtRules();
 				//expect a selector
-				selector();
+				TokenSequence.Builder selector = new TokenSequence.Builder();
+				while (t.tokenCode != LEFT_CURLY_BRACKET)
+				{
+					selector.append(t);
+					t = s.nextToken();
+				}
+				match(LEFT_CURLY_BRACKET);
+				List<Declaration> declarations = new ArrayList<Declaration>();
+				while(t.tokenCode != RIGHT_CURLY_BRACKET)
+				{
+					TokenSequence.Builder property = new TokenSequence.Builder();
+					property.append(t);
+					
+					match(IDENTIFIER);
+					match(COLON);
+					TokenSequence.Builder value = new TokenSequence.Builder();
+					while (t.tokenCode != RIGHT_CURLY_BRACKET && t.tokenCode != SEMICOLON)
+					{
+						value.append(t);
+						t = s.nextToken();
+					}
+					declarations.add(new Declaration(property.create(), value.create(), false));
+					if (t.tokenCode == SEMICOLON)
+						t = s.nextToken();
+				}
+				match (RIGHT_CURLY_BRACKET);
+				handler.handleRuleSet(new RuleSet(selector.create(), declarations));
 			}
 		}
 		match(EOF);
 		
 	}
-	
-	//handles {@literal @} rules, such as keyframes, font-face, import, and media
-	private void atRules(String selector) throws IOException
-	{
-		if (debug)
-			enter("@rules");
-		
-		String rule = selector.substring(1);
-		if (rule.equalsIgnoreCase("charset"))
-		{
-			//must be first thing (comments ok)
-			
-			System.out.println(String.format(Locale.US, "charset must be set in Constructor. Skipping at-rule \"%s\".", selector));
-		}
-		else if (rule.equalsIgnoreCase("import"))
-		{
-			//must be first thing (or right after charset)
-		}
-		else if (rule.equalsIgnoreCase("namespace"))
-		{
-			
-		}
-		else if (rule.equalsIgnoreCase("media"))
-		{
-			
-		}
-		else if (rule.equalsIgnoreCase("page"))
-		{
-			
-		}
-		else if (rule.equalsIgnoreCase("font-face"))
-		{
-			
-		}
-		else if (rule.equalsIgnoreCase("keyframes"))
-		{
-			
-		}
-		else if (rule.equalsIgnoreCase("supports"))
-		{
-			
-		}
-		else if (rule.equalsIgnoreCase("document"))
-		{
-			
-		}
-		if (debug)
-			exit("@rules");
-	}
-	
-	//parses the rules
-	private void rules() throws IOException
-	{
-		if (debug)
-			enter("rules");
-		
-		if (debug)
-			exit("rules");
-	}
-	
-	//parse a selector
-	private void selector() throws IOException
-	{
-		if (debug)
-			enter("selector");
-		List<Token> tokens = new ArrayList<Token>();
-		StringBuilder builder = new StringBuilder();
-		while (t.tokenCode != LEFT_CURLY_BRACKET)
-		{
-			tokens.add(t);
-			builder.append(t.toString());
-			t = s.nextToken();
-		}
-		match(LEFT_CURLY_BRACKET);
-		if (tokens.size() == 0)
-			match(RIGHT_CURLY_BRACKET);
-		else if (tokens.get(0).tokenCode == AT)
-			atRules(builder.toString());
-		else
-			rules();
-		match(RIGHT_CURLY_BRACKET);
-		
-		//TODO: call handler method, providing selector and rules. This allows changes to be made while parsing!!!
-		//call handler method here!
-		
-//		switch(t.tokenCode)
-//		{
-//			case DOT :
-//				tokens.add(t);
-//				match(DOT);
-//				if (t.tokenCode == IDENTIFIER)
-//				{
-//					tokens.add(t);
-//					match(IDENTIFIER);
-//				}
-//				else if (t.tokenCode <= RESERVEDWORD.length)
-//				{
-//					//may have been mistaken for a keyword
-//					tokens.add(new Token(IDENTIFIER, RESERVEDWORD[t.tokenCode]));
-//					t = s.nextToken();
-//				}
-//				else
-//				{
-//					System.err.println("Bad Selector Error. Could not validate \"." + t.toString() + "\".");
-//					System.exit(0);
-//				}
-//				break;
-//			case HASH :
-//				break;
-//			case TIMES :
-//				break;
-//			case COLON :
-//				break;
-//			case DOUBLE_COLON :
-//				break;
-//			case LEFTSQ :
-//				break;
-//			case AT :
-//				break;
-//			default :
-//				
-//				break;
-//		}
-//
-//		if (t.tokenCode == LEFT_CURLY_BRACKET)
-//		{
-//			//start the rules
-//		}
-		if (debug)
-			exit("selector");
-	}
-	
 	/**
 	 * Parses and prints debug info
 	 * @throws IOException 
@@ -358,25 +282,25 @@ public class CSSParser implements ParserConstants
 		parse();
 	}
 	
-	private void enter(String s)
-	{
-		indent++;
-		for (int i = 0; i < indent; i++)
-		{
-			System.out.print(" ");
-		}
-		System.out.println(s + ">>");
-	}
-	
-	private void exit(String s)
-	{
-		indent--;
-		for (int i = 0; i < indent; i++)
-		{
-			System.out.print(" ");
-		}
-		System.out.println("<<" + s);
-	}
+//	private void enter(String s)
+//	{
+//		indent++;
+//		for (int i = 0; i < indent; i++)
+//		{
+//			System.out.print(" ");
+//		}
+//		System.out.println(s + ">>");
+//	}
+//	
+//	private void exit(String s)
+//	{
+//		indent--;
+//		for (int i = 0; i < indent; i++)
+//		{
+//			System.out.print(" ");
+//		}
+//		System.out.println("<<" + s);
+//	}
 	
 	
 }

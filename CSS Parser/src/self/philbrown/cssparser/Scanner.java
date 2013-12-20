@@ -17,10 +17,10 @@ public class Scanner implements ParserConstants
 	private char C;
 	private BufferedReader source;
 	private int cursor = 0;
+	private int charInLine = 0;
+	private int line = 1;
 	private List<String> imports = new ArrayList<String>();
 	private List<String> supports = new ArrayList<String>();
-	
-	//TODO add count (cursor). Also add Line count.
 	
 	private InputStream is;
 	
@@ -91,6 +91,12 @@ public class Scanner implements ParserConstants
 	{
 		C = (char) source.read();
 		cursor++;
+		charInLine++;
+		if (C == Character.LINE_SEPARATOR)
+		{
+			line++;
+			charInLine = 0;
+		}
 	}
 	
 	public Token nextToken() throws IOException
@@ -99,7 +105,10 @@ public class Scanner implements ParserConstants
 		
 		//get through whitespace
 		while (Character.isWhitespace(C))
+		{
+			//System.out.println(String.valueOf(C));//FIXME remove this
 			getChar();
+		}
 		
 		//Identifier or reserved word
 		if (Character.isLetter(C))
@@ -288,4 +297,21 @@ public class Scanner implements ParserConstants
 		}
 		return IDENTIFIER;
 	}
+	
+	public int getLineNumber()
+	{
+		return line;
+	}
+	
+	public int getCharacterNumber()
+	{
+		return cursor;
+	}
+	
+	public int getCharacterNumberForCurrentLine()
+	{
+		return charInLine;
+	}
+	
+	
 }

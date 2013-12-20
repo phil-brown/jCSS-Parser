@@ -12,10 +12,10 @@ import java.util.List;
 public interface CSSHandler 
 {
 
-	//at-rules
+	//error
+	public void handleError(String error, Throwable t);
 	
-	//@charset
-	public String handleCharset(String charset);
+	//at-rules
 	
 	//@import
 	public InputStream handleImport(String importString);
@@ -29,8 +29,11 @@ public interface CSSHandler
 	//@keyframes
 	public void handleKeyframes(String identifier, List<KeyFrame> keyframes);
 	
+	//@fornt-face
+	public void handleFontFace(FontFace font);
 	
-	public void handleSelection(Token[] tokens, String asString);
+	//rule set
+	public void handleRuleSet(RuleSet ruleSet);
 	
 	
 }

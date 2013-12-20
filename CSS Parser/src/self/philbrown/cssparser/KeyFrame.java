@@ -2,6 +2,7 @@ package self.philbrown.cssparser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class KeyFrame {
 
@@ -31,5 +32,17 @@ public class KeyFrame {
 		this.declarationBlock = declarationBlock;
 	}
 	
+	@Override
+	public String toString()
+	{
+		StringBuilder block = new StringBuilder("{\n");
+		for (int i = 0; i < declarationBlock.size(); i++)
+		{
+			block.append(" ").append(declarationBlock.get(i)).append(";\n");
+		}
+		block.append("}");
+		
+		return String.format(Locale.US, "%d%%: %s", percent, block.toString());
+	}
 	
 }
