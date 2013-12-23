@@ -10,7 +10,7 @@ import java.util.Locale;
  * @since 1:40:02 PM Dec 19, 2013
  *
  */
-public class RuleSet implements Statement
+public class RuleSet
 {
 
 	private TokenSequence selector;
@@ -62,5 +62,16 @@ public class RuleSet implements Statement
 		return String.format(Locale.US, "%s %s", selector.toString(), block.toString());
 	}
 	
+	public String toDebugString()
+	{
+		StringBuilder block = new StringBuilder(" {\n");
+		for (int i = 0; i < declarationBlock.size(); i++)
+		{
+			block.append(" ").append(declarationBlock.get(i)).append(";\n");
+		}
+		block.append("}");
+		
+		return String.format(Locale.US, "%s %s", selector.toString(), block.toString());
+	}
 	
 }

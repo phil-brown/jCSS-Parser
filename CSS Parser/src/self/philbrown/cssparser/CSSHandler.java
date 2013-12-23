@@ -20,6 +20,9 @@ public interface CSSHandler
 	//@import
 	public InputStream handleImport(String importString);
 	
+	//@charset
+	public void handleNewCharset(String charset);
+	
 	//@namespace
 	public void handleNamespace(String namespace);
 	

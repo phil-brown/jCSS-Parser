@@ -84,6 +84,13 @@ public class Scanner implements ParserConstants
 		source.close();
 		source = new BufferedReader(new InputStreamReader(is, charset));
 		source.skip(cursor);
+		/*
+		for (int i = 0; i < cursor; i++)
+		{
+			source.read();
+		}
+		 */
+		//FIXME this does not work correctly.
 		getChar();
 	}
 	
@@ -111,9 +118,9 @@ public class Scanner implements ParserConstants
 		}
 		
 		//Identifier or reserved word
-		if (Character.isLetter(C))
+		if (Character.isLetter(C) || C == '-')
 		{
-			while (Character.isLetter(C) || C == '-')
+			while (Character.isLetter(C) || C == '-' || Character.isDigit(C))
 			{
 				attribute += C;
 				getChar();
@@ -277,6 +284,10 @@ public class Scanner implements ParserConstants
 				}
 				return new Token(AT, null);
 			}
+			case ';' : {
+				getChar();
+				return new Token(SEMICOLON, null);
+			}
 			case EOFCHAR : {
 				return new Token(EOF, null);
 			}
@@ -300,17 +311,17 @@ public class Scanner implements ParserConstants
 	
 	public int getLineNumber()
 	{
-		return line;
+		return line;//FIXME not working.
 	}
 	
 	public int getCharacterNumber()
 	{
-		return cursor;
+		return cursor+1;
 	}
 	
 	public int getCharacterNumberForCurrentLine()
 	{
-		return charInLine;
+		return charInLine+1;
 	}
 	
 	

@@ -69,4 +69,52 @@ public class Token implements ParserConstants
 	        default: return String.format(Locale.US, "%d  Unknown Character", tokenCode);
 		}
 	}
+	
+	public String toDebugString()
+	{
+		if (tokenCode <= RESERVEDWORD.length)
+			return RESERVEDWORD[tokenCode];
+		switch (tokenCode)
+		{
+			case DOT : return ".";
+			case HASH : return "#";
+			case COMMA : return ",";
+			case COLON : return ":";
+			case SEMICOLON : return ";";
+			case LEFTSQ : return "[";
+			case RIGHTSQ : return "]";
+			case MINUS : return "-";
+			case LEFTPAREN : return "(";
+			case RIGHTPAREN : return ")";
+			case TIMES : return "*";
+			case GT : return ">";
+			case LT : return "<";
+			case OR : return "|";
+			case PLUS : return "+";
+			case NOT_EQUAL : return "~=";
+			case EQUAL : return "=";
+			case OR_EQUAL : return "|=";
+			case TIMES_EQUAL : return "*=";
+			case CARET_EQUAL : return "^=";
+			case DOLLAR_EQUAL : return "$=";
+			case AT : return "@";
+			case CARET : return "^";
+			case DOLLAR : return "$";
+			case NUMBER : return (attribute == null ? "[NUMBER]" : attribute);
+			case IDENTIFIER : return (attribute == null ? "[IDENTIFIER]" : attribute);
+			case LEFT_CURLY_BRACKET : return "\n{\n";
+			case RIGHT_CURLY_BRACKET : return "\n}\n";
+			case SLASH_STAR : return "/*";
+			case STAR_SLASH : return "*/";
+			case SLASH : return "/";
+			case COMMENT : return (attribute == null ? "[COMMENT]" : "/*" + attribute + "*/\n");
+			case DOUBLE_COLON : return "::";
+			case SINGLE_QUOTE : return "'";
+			case DOUBLE_QUOTE : return "\"";
+			case AT_RULE : return (attribute == null ? "[AT RULE]" : attribute);
+			case PERCENT : return "%";
+	        case EOF: return "\nEOF\n";
+	        default: return String.format(Locale.US, "%d  Unknown Character", tokenCode);
+		}
+	}
 }

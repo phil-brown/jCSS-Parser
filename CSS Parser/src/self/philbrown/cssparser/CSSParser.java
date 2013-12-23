@@ -33,12 +33,12 @@ public class CSSParser implements ParserConstants
 				for (int i = 0; i < indent; i++) {
 					System.out.print(" ");
 				}
-				System.out.print(t.toString());
+				System.out.print(t.toDebugString());
 			}
 			t = s.nextToken();
 		}
 		else {
-			handler.handleError(String.format(Locale.US, "Match Error: %s needed. Found: %s.", new Token(matcher, null).toString(), t.toString()), new Exception("Matcher Error"));
+			handler.handleError(String.format(Locale.US, "Match Error at line %d and character %d. Need: %s Found: %s", s.getLineNumber(), s.getCharacterNumberForCurrentLine(), new Token(matcher, null).toDebugString(), t.toString()), new Exception("Matcher Error"));
 			System.exit(0);
 		}
 	}
@@ -55,7 +55,7 @@ public class CSSParser implements ParserConstants
 			}
 			else if (t.tokenCode == AT_RULE)
 			{
-				String identifier = t.attribute.substring(1);
+				String identifier = t.attribute;
 				if (identifier.equalsIgnoreCase("charset"))
 				{
 					match(AT_RULE);
@@ -64,6 +64,7 @@ public class CSSParser implements ParserConstants
 					match(SEMICOLON);
 					s.changeCharset(charset);
 					t = s.nextToken();
+					handler.handleNewCharset(charset);
 				}
 				else if (identifier.equalsIgnoreCase("import"))
 				{
@@ -82,7 +83,7 @@ public class CSSParser implements ParserConstants
 						s.include(is, name);
 						t = s.nextToken();
 					}
-					
+					handler.handleImport(name);
 				}
 				else if (identifier.equalsIgnoreCase("namespace"))
 				{
@@ -263,7 +264,7 @@ public class CSSParser implements ParserConstants
 					}
 					declarations.add(new Declaration(property.create(), value.create(), false));
 					if (t.tokenCode == SEMICOLON)
-						t = s.nextToken();
+						match(SEMICOLON);
 				}
 				match (RIGHT_CURLY_BRACKET);
 				handler.handleRuleSet(new RuleSet(selector.create(), declarations));

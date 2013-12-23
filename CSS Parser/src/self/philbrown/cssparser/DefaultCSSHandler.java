@@ -17,6 +17,11 @@ public class DefaultCSSHandler implements CSSHandler
 		System.out.println("Found Import @" + importString);
 		return null;
 	}
+	
+	@Override
+	public void handleNewCharset(String charset) {
+		System.out.println("New Charset: " + charset);
+	}
 
 	@Override
 	public void handleNamespace(String namespace) {
