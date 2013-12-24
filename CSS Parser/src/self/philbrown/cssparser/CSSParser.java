@@ -1,3 +1,19 @@
+/*
+ * Copyright 2013 Phil Brown
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package self.philbrown.cssparser;
 
 import java.io.IOException;
@@ -28,13 +44,13 @@ public class CSSParser implements ParserConstants
 	{
 		if (t.tokenCode == matcher)
 		{
-			if (debug)
-			{
-				for (int i = 0; i < indent; i++) {
-					System.out.print(" ");
-				}
-				System.out.print(t.toDebugString());
-			}
+//			if (debug)
+//			{
+//				for (int i = 0; i < indent; i++) {
+//					System.out.print(" ");
+//				}
+//				System.out.print(t.toDebugString());
+//			}
 			t = s.nextToken();
 		}
 		else {
@@ -46,6 +62,8 @@ public class CSSParser implements ParserConstants
 	public void parse() throws IOException
 	{
 		t = s.nextToken();
+		if (debug)
+			System.out.println("[" + t.toDebugString() + "]");
 		
 		while (t.tokenCode != EOF)
 		{
@@ -63,7 +81,7 @@ public class CSSParser implements ParserConstants
 					match(IDENTIFIER);
 					match(SEMICOLON);
 					s.changeCharset(charset);
-					t = s.nextToken();
+					//t = s.nextToken();
 					handler.handleNewCharset(charset);
 				}
 				else if (identifier.equalsIgnoreCase("import"))
@@ -75,15 +93,15 @@ public class CSSParser implements ParserConstants
 						importString.append(t.toString());
 						t = s.nextToken();
 					}
+					match(SEMICOLON);
 					String name = importString.toString();
 					InputStream is = handler.handleImport(name);
 					if (is != null)
 					{
 						//FIXME: this doesn't allow multiple imports to import in the correct order
 						s.include(is, name);
-						t = s.nextToken();
+						//t = s.nextToken();
 					}
-					handler.handleImport(name);
 				}
 				else if (identifier.equalsIgnoreCase("namespace"))
 				{
@@ -96,7 +114,7 @@ public class CSSParser implements ParserConstants
 					}
 					handler.handleNamespace(namespace.toString());
 					//namespace not currently supported (what would it do?)
-					t = s.nextToken();
+					//t = s.nextToken();
 				}
 				else if (identifier.equalsIgnoreCase("supports"))
 				{
@@ -125,7 +143,7 @@ public class CSSParser implements ParserConstants
 							t = s.nextToken();
 						}
 					}
-					t = s.nextToken();
+					//t = s.nextToken();
 				}
 				else if (identifier.equalsIgnoreCase("keyframes"))
 				{
@@ -182,6 +200,7 @@ public class CSSParser implements ParserConstants
 								while (t.tokenCode != RIGHT_CURLY_BRACKET && t.tokenCode != SEMICOLON)
 								{
 									value.append(t);
+									t = s.nextToken(false);
 								}
 								declarations.add(new Declaration(property.create(), value.create(), false));
 								t = s.nextToken();
@@ -196,7 +215,7 @@ public class CSSParser implements ParserConstants
 						
 					}
 					handler.handleKeyframes(ident, keyFrames);
-					t = s.nextToken();
+					//t = s.nextToken();
 				}
 				else if (identifier.equals("font-face"))
 				{
@@ -215,6 +234,7 @@ public class CSSParser implements ParserConstants
 						while (t.tokenCode != RIGHT_CURLY_BRACKET && t.tokenCode != SEMICOLON)
 						{
 							value.append(t);
+							t = s.nextToken(false);
 						}
 						declarations.add(new Declaration(property.create(), value.create(), false));
 						t = s.nextToken();
@@ -260,7 +280,7 @@ public class CSSParser implements ParserConstants
 					while (t.tokenCode != RIGHT_CURLY_BRACKET && t.tokenCode != SEMICOLON)
 					{
 						value.append(t);
-						t = s.nextToken();
+						t = s.nextToken(false);
 					}
 					declarations.add(new Declaration(property.create(), value.create(), false));
 					if (t.tokenCode == SEMICOLON)
@@ -273,6 +293,15 @@ public class CSSParser implements ParserConstants
 		match(EOF);
 		
 	}
+	
+	public char getLineSeparator() {
+		return s.getLineSeparator();
+	}
+
+	public void setLineSeparator(char lineSeparator) {
+		s.setLineSeparator(lineSeparator);
+	}
+	
 	/**
 	 * Parses and prints debug info
 	 * @throws IOException 

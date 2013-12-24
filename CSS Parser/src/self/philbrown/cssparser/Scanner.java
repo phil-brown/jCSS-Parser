@@ -1,3 +1,19 @@
+/*
+ * Copyright 2013 Phil Brown
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package self.philbrown.cssparser;
 
 import java.io.BufferedReader;
@@ -23,6 +39,8 @@ public class Scanner implements ParserConstants
 	private List<String> supports = new ArrayList<String>();
 	
 	private InputStream is;
+	
+	private char lineSeparator = Character.LINE_SEPARATOR;
 	
 	public Scanner(InputStream source) throws IOException
 	{
@@ -99,7 +117,7 @@ public class Scanner implements ParserConstants
 		C = (char) source.read();
 		cursor++;
 		charInLine++;
-		if (C == Character.LINE_SEPARATOR)
+		if (C == lineSeparator)
 		{
 			line++;
 			charInLine = 0;
@@ -108,19 +126,28 @@ public class Scanner implements ParserConstants
 	
 	public Token nextToken() throws IOException
 	{
+		return nextToken(true);
+	}
+	
+	public Token nextToken(boolean ignoreWhitespace) throws IOException
+	{
 		String attribute = "";
 		
-		//get through whitespace
-		while (Character.isWhitespace(C))
+		if (ignoreWhitespace)
 		{
-			//System.out.println(String.valueOf(C));//FIXME remove this
-			getChar();
+			//get through whitespace
+			while (Character.isWhitespace(C))
+			{
+				//System.out.println(String.valueOf(C));//FIXME remove this
+				getChar();
+			}
 		}
 		
+		
 		//Identifier or reserved word
-		if (Character.isLetter(C) || C == '-')
+		if (Character.isLetter(C) || C == '-' || C == '_')
 		{
-			while (Character.isLetter(C) || C == '-' || Character.isDigit(C))
+			while (Character.isLetter(C) || C == '-' || Character.isDigit(C) || C == '_')
 			{
 				attribute += C;
 				getChar();
@@ -288,6 +315,10 @@ public class Scanner implements ParserConstants
 				getChar();
 				return new Token(SEMICOLON, null);
 			}
+			case ' ' : {
+				getChar();
+				return new Token(SPACE, null);
+			}
 			case EOFCHAR : {
 				return new Token(EOF, null);
 			}
@@ -323,6 +354,13 @@ public class Scanner implements ParserConstants
 	{
 		return charInLine+1;
 	}
-	
+
+	public char getLineSeparator() {
+		return lineSeparator;
+	}
+
+	public void setLineSeparator(char lineSeparator) {
+		this.lineSeparator = lineSeparator;
+	}
 	
 }
