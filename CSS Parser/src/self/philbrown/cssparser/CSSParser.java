@@ -22,6 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * 
+ * @author Phil Brown
+ * @since 2:39:59 PM Dec 18, 2013
+ */
 public class CSSParser implements ParserConstants
 {
 
@@ -44,13 +49,13 @@ public class CSSParser implements ParserConstants
 	{
 		if (t.tokenCode == matcher)
 		{
-//			if (debug)
-//			{
-//				for (int i = 0; i < indent; i++) {
-//					System.out.print(" ");
-//				}
-//				System.out.print(t.toDebugString());
-//			}
+			if (debug)
+			{
+				for (int i = 0; i < indent; i++) {
+					System.out.print(" ");
+				}
+				System.out.print(t.toDebugString());
+			}
 			t = s.nextToken();
 		}
 		else {
@@ -93,7 +98,6 @@ public class CSSParser implements ParserConstants
 						importString.append(t.toString());
 						t = s.nextToken();
 					}
-					match(SEMICOLON);
 					String name = importString.toString();
 					InputStream is = handler.handleImport(name);
 					if (is != null)
@@ -102,6 +106,7 @@ public class CSSParser implements ParserConstants
 						s.include(is, name);
 						//t = s.nextToken();
 					}
+					match(SEMICOLON);
 				}
 				else if (identifier.equalsIgnoreCase("namespace"))
 				{
@@ -125,24 +130,58 @@ public class CSSParser implements ParserConstants
 						logic.append(t.toString());
 						t = s.nextToken();
 					}
+					match(LEFT_CURLY_BRACKET);
 					boolean supports = handler.supports(logic.toString());
 					if (supports)
 					{
 						logic = new StringBuilder();
-						while (t.tokenCode != RIGHT_CURLY_BRACKET)
+						int curlies = 1;
+						Token firstToken = new Token(t.tokenCode, t.attribute);
+						while (curlies > 0)
 						{
-							logic.append(t.toString());
+							if (t.tokenCode == LEFT_CURLY_BRACKET)
+							{
+								curlies++;
+							}
+							else if (t.tokenCode == RIGHT_CURLY_BRACKET)
+							{
+								curlies--;
+							}
+							
+							if (t.tokenCode == AT_RULE)
+							{
+								logic.append("@").append(t.toString()).append(" ");
+							}
+							else
+							{
+								logic.append(t.toString());
+							}
+							
 							t = s.nextToken();
 						}
+						//t = firstToken;
+						//System.out.println("TOKENS= "+ logic.toString());
 						s.include(logic.toString());//include the supports css
+						//t = s.nextToken();
+						//System.out.println("CURRENT TOKEN= "+ t.toDebugString());
 					}
 					else
 					{
-						while (t.tokenCode != RIGHT_CURLY_BRACKET)
+						int curlies = 1;
+						while (curlies > 0)
 						{
+							if (t.tokenCode == LEFT_CURLY_BRACKET)
+							{
+								curlies++;
+							}
+							else if (t.tokenCode == RIGHT_CURLY_BRACKET)
+							{
+								curlies--;
+							}
 							t = s.nextToken();
 						}
 					}
+
 					//t = s.nextToken();
 				}
 				else if (identifier.equalsIgnoreCase("keyframes"))
@@ -241,7 +280,7 @@ public class CSSParser implements ParserConstants
 					}
 					match (RIGHT_CURLY_BRACKET);
 					try {
-						FontFace f = new FontFace(declarations);
+						FontFace f = new FontFace(declarations, s);
 						handler.handleFontFace(f);
 					}
 					catch (Throwable t)
@@ -262,10 +301,15 @@ public class CSSParser implements ParserConstants
 			{
 				//expect a selector
 				TokenSequence.Builder selector = new TokenSequence.Builder();
-				while (t.tokenCode != LEFT_CURLY_BRACKET)
+				while (t.tokenCode != LEFT_CURLY_BRACKET && t.tokenCode != EOF)
 				{
 					selector.append(t);
 					t = s.nextToken();
+				}
+				if (t.tokenCode == EOF)
+				{
+					match(EOF);
+					return;
 				}
 				match(LEFT_CURLY_BRACKET);
 				List<Declaration> declarations = new ArrayList<Declaration>();

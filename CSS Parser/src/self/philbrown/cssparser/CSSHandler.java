@@ -28,30 +28,61 @@ import java.util.List;
 public interface CSSHandler 
 {
 
-	//error
+	/**
+	 * Handle a parse error. This is called before the parser exits.
+	 * @param error the error message
+	 * @param t the error. This may be {@code null}.
+	 */
 	public void handleError(String error, Throwable t);
 	
 	//at-rules
 	
-	//@import
+	/**
+	 * Handle the {@literal @}import At-Rule
+	 * @param importString the name of the file to input. This can be interpreted any way.
+	 * @return an {@code InputStream} associated with the given name, or {@code null}.
+	 */
 	public InputStream handleImport(String importString);
 	
-	//@charset
+	/**
+	 * Alerts the listener that a {@literal @}charset At-Rule has been parsed and handled by the
+	 * {@link Scanner}.
+	 * @param charset the charset String.
+	 * FIXME: this needs further tests.
+	 */
 	public void handleNewCharset(String charset);
 	
-	//@namespace
+	/**
+	 * Handle the {@literal @}namespace At-Rule.
+	 * @param namespace the namespace
+	 */
 	public void handleNamespace(String namespace);
 	
-	//@supports
+	/**
+	 * Gets whether or not the logic is {@code true} for the given {@literal @}support query
+	 * @param logic the supports logic to query
+	 * @return {@code true} if the support block should be included (at the end of the CSS Input Stream).
+	 * Otherwise {@code false}.
+	 */
 	public boolean supports(String logic);
 	
-	//@keyframes
+	/**
+	 * Handle {@literal @}Keyframes At-Rule
+	 * @param identifier the name of the keyframes animation
+	 * @param keyframes a list of the keyframes
+	 */
 	public void handleKeyframes(String identifier, List<KeyFrame> keyframes);
 	
-	//@fornt-face
+	/**
+	 * Handle the {@literal @}Font-Face At-Rule
+	 * @param font the FontFace that has been parsed.
+	 */
 	public void handleFontFace(FontFace font);
 	
-	//rule set
+	/**
+	 * Called once the parser has completed.
+	 * @param ruleSet contains all the parsed rules
+	 */
 	public void handleRuleSet(RuleSet ruleSet);
 	
 	

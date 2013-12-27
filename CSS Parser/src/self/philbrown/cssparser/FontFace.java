@@ -64,6 +64,8 @@ public class FontFace implements ParserConstants
 	
 	private String unicodeRange = "U+0-10FFFF";
 	
+	private Scanner scanner;//needs access to lineSeparator
+	
 	/**
 	 * Maps function name to a list of resources. This is useful so that there can be multiple resources
 	 * used. For example, it will map the following:
@@ -83,17 +85,18 @@ public class FontFace implements ParserConstants
 	 * @param fontFamily
 	 * @param sources
 	 */
-	public FontFace(String fontFamily, Map<String, List<String>> sources)
+	public FontFace(String fontFamily, Map<String, List<String>> sources, Scanner s)
 	{
 		this.fontFamily = fontFamily;
 		this.sources = sources;
+		this.scanner = s;
 	}
 	
 	private boolean match(Token t, int matcher) throws Exception
 	{
 		if (t.tokenCode == matcher)
 			return true;
-		throw new Exception("bad src!");
+		throw new Exception("bad src! Found unexpected token: " + t.toDebugString());
 	}
 	
 	/**
@@ -101,8 +104,9 @@ public class FontFace implements ParserConstants
 	 * @param declarationBlock
 	 * @throws Exception if the declarations are not correctly formatted.
 	 */
-	public FontFace(List<Declaration> declarationBlock) throws Exception
+	public FontFace(List<Declaration> declarationBlock, Scanner s) throws Exception
 	{
+		this.scanner = s;
 		for (int i = 0; i < declarationBlock.size(); i++)
 		{
 			Declaration d = declarationBlock.get(i);
@@ -118,24 +122,26 @@ public class FontFace implements ParserConstants
 				while (iterator.hasNext())
 				{
 					Token t = iterator.next();
-					if (t.tokenCode == COMMA)
-						t = iterator.next();
-					String function = t.toString();
-					match(t, IDENTIFIER);
-					t = iterator.next();
-					match(t, LEFTPAREN);
-					t = iterator.next();
-					StringBuilder uri = new StringBuilder();
-					while (t.tokenCode != RIGHTPAREN)
+					if (t.tokenCode != COMMA && t.tokenCode != SPACE && t.tokenCode != scanner.getLineSeparator())
 					{
-						uri.append(t.toString());
+						String function = t.toString();
+						match(t, IDENTIFIER);
 						t = iterator.next();
+						match(t, LEFTPAREN);
+						t = iterator.next();
+						StringBuilder uri = new StringBuilder();
+						while (t.tokenCode != RIGHTPAREN)
+						{
+							uri.append(t.toString());
+							t = iterator.next();
+						}
+						List<String> resources = sources.get(function);
+						if (resources == null)
+							resources = new ArrayList<String>();
+						resources.add(uri.toString());
+						sources.put(function, resources);
 					}
-					List<String> resources = sources.get(function);
-					if (resources == null)
-						resources = new ArrayList<String>();
-					resources.add(uri.toString());
-					sources.put(function, resources);
+					
 						
 				}
 				

@@ -19,12 +19,28 @@ package self.philbrown.cssparser;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+/**
+ * 
+ * @author Phil Brown
+ * @since 2:39:59 PM Dec 18, 2013
+ */
 public class Tester 
 {
 
 	public static void main(String[] args)
 	{
-		CSSHandler handler = new DefaultCSSHandler();
+		CSSHandler handler = new DefaultCSSHandler() {
+			@Override
+			public InputStream handleImport(String importString) {
+				System.out.println("Found @import " + importString);
+				return new ByteArrayInputStream(".foobar{height:100%}".getBytes());
+			}
+			
+			@Override
+			public boolean supports(String logic) {
+				return true;
+			}
+		};
 		try
 		{
 			CSSParser parser = new CSSParser(getSampleInputStream(), handler);
@@ -50,7 +66,8 @@ public class Tester
 	    "@font-face\n"+
 	    "{\n"+
 	    "  font-family: myFirstFont;\n"+
-	    "  src: url(sansation_light.woff);\n"+
+	    "  src: url(sansation_light.woff),\n" +
+	    "       asset(fonts/sans_light.ttf);\n"+
 	    "}\n"+
 	    "/*\n" +
 		"\n"+
@@ -87,6 +104,14 @@ public class Tester
 		"::-moz-selection {\n" +
 		"    background: #b3d4fc;\n" +
 		"    text-shadow: none;\n" +
+		"}\n" +
+		"@supports (debug) {\n" +
+		"    @keyframes mySupportMove\n"+
+	    "    {\n"+
+	    "        from {top:0px;}\n"+
+	    "        to {top:200px;}\n"+
+	    "    }\n"+
+	    "    test : { background: #000000 }\n" +
 		"}\n" +
 		"\n" +
 		"::selection {\n" +

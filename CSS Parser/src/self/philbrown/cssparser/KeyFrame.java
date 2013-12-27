@@ -20,6 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * 
+ * @author Phil Brown
+ * @since 2:39:59 PM Dec 18, 2013
+ */
 public class KeyFrame {
 
 	private double percent;

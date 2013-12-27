@@ -17,7 +17,9 @@
 package self.philbrown.cssparser;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * Simple organization of a sequence of tokens.
@@ -40,6 +42,16 @@ public class TokenSequence
 	public List<Token> getTokens()
 	{
 		return tokens;
+	}
+	
+	public Enumeration<Token> enumerate()
+	{
+		Vector<Token> vector = new Vector<Token>();
+		for (int i = 0; i < tokens.size(); i++)
+		{
+			vector.add(tokens.get(i));
+		}
+		return vector.elements();
 	}
 	
 	@Override

@@ -21,11 +21,15 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.SequenceInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * 
+ * @author Phil Brown
+ * @since 2:39:59 PM Dec 18, 2013
+ */
 public class Scanner implements ParserConstants 
 {
 
@@ -45,20 +49,35 @@ public class Scanner implements ParserConstants
 	public Scanner(InputStream source) throws IOException
 	{
 		this.is = source;
-		this.source = new BufferedReader(new InputStreamReader(source, charset));
+		this.source = new BufferedReader(new InputStreamReader(is, charset));
 		getChar();
 		
 	}
 	
+	/**
+	 * Handle {@literal @}support. Supported css is appended to the end of the css input.
+	 * @param ruleSets
+	 * @throws IOException
+	 */
 	public void include(String ruleSets) throws IOException
 	{
 		if (supports.contains(ruleSets))
 			return;
 		supports.add(ruleSets);
+		//costly.
+		StringBuilder builder = new StringBuilder();
+		String read = source.readLine();
+		while(read != null) {
+		    //System.out.println(read);
+			builder.append(read);
+			read = source.readLine();
+		}
 		source.close();
-		is = new SequenceInputStream(new ByteArrayInputStream(ruleSets.getBytes()), is);
-		source = new BufferedReader(new InputStreamReader(is, charset));
-		getChar();
+	    String currentStreamContents = builder.toString();
+	    
+	    this.is = new ByteArrayInputStream(String.format(Locale.US, "%s%s", currentStreamContents,ruleSets).getBytes());
+		this.source = new BufferedReader(new InputStreamReader(is, charset));
+		//getChar();
 	}
 	
 	/**
@@ -72,18 +91,26 @@ public class Scanner implements ParserConstants
 		
 		
 		if (imports.contains(name))
-		{
 			return;
+		
+		imports.add(name);
+		
+		//costly.
+		StringBuilder builder = new StringBuilder();
+		String read = source.readLine();
+		while(read != null) {
+		    //System.out.println(read);
+			builder.append(read);
+			read = source.readLine();
 		}
-		else
-		{
-			imports.add(name);
-			source.close();
-			//FIXME: this will cause the imports to come in reverse order. Consider adding in order created by #imports Object
-			is = new SequenceInputStream(stylesheet, is);
-			source = new BufferedReader(new InputStreamReader(is, charset));
-			getChar();
-		}
+		source.close();
+	    String currentStreamContents = builder.toString();
+	    java.util.Scanner s = new java.util.Scanner(stylesheet).useDelimiter("\\A");
+	    String newStreamContents = s.hasNext() ? s.next() : "";
+	    
+	    this.is = new ByteArrayInputStream(String.format(Locale.US, "%s%s", newStreamContents,currentStreamContents).getBytes());
+		this.source = new BufferedReader(new InputStreamReader(is, charset));
+		getChar();
 		
 		
 	}
@@ -99,16 +126,20 @@ public class Scanner implements ParserConstants
 			return;
 		this.charset = charset;
 		//change the charset
-		source.close();
-		source = new BufferedReader(new InputStreamReader(is, charset));
-		source.skip(cursor);
-		/*
-		for (int i = 0; i < cursor; i++)
-		{
-			source.read();
+		
+		
+		//costly.
+		StringBuilder builder = new StringBuilder();
+		String read = source.readLine();
+		while(read != null) {
+		    //System.out.println(read);
+			builder.append(read);
+			read = source.readLine();
 		}
-		 */
-		//FIXME this does not work correctly.
+		source.close();
+	    String currentStreamContents = builder.toString();
+	    this.source = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(currentStreamContents.getBytes()), charset));
+	    //source.skip(cursor);
 		getChar();
 	}
 	
@@ -142,7 +173,6 @@ public class Scanner implements ParserConstants
 				getChar();
 			}
 		}
-		
 		
 		//Identifier or reserved word
 		if (Character.isLetter(C) || C == '-' || C == '_')
@@ -315,6 +345,10 @@ public class Scanner implements ParserConstants
 				getChar();
 				return new Token(SEMICOLON, null);
 			}
+			case '%' : {
+				getChar();
+				return new Token(PERCENT, null);
+			}
 			case ' ' : {
 				getChar();
 				return new Token(SPACE, null);
@@ -323,7 +357,7 @@ public class Scanner implements ParserConstants
 				return new Token(EOF, null);
 			}
 			default : {
-				System.out.println(String.format(Locale.US, "Invalid Token '%s'", String.valueOf(C)));
+				System.out.println(String.format(Locale.US, "Unexpected Token '%s'", String.valueOf(C)));
 				getChar();
 				return nextToken();
 			}

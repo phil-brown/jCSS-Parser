@@ -16,6 +16,11 @@
 
 package self.philbrown.cssparser;
 
+/**
+ * 
+ * @author Phil Brown
+ * @since 2:39:59 PM Dec 18, 2013
+ */
 public interface ParserConstants 
 {
 	public static final int LINK = 1,

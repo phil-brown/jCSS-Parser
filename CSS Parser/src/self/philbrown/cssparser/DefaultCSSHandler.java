@@ -19,6 +19,11 @@ package self.philbrown.cssparser;
 import java.io.InputStream;
 import java.util.List;
 
+/**
+ * 
+ * @author Phil Brown
+ * @since 2:39:59 PM Dec 18, 2013
+ */
 public class DefaultCSSHandler implements CSSHandler
 {
 

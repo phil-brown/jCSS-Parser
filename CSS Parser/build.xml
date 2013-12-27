@@ -1,0 +1,44 @@
+<!--
+ Copyright 2013 Phil Brown
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ 
+     http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<project name="jCSS-Parser" >
+    
+    <target name="setup" description="setup values, such as version number" >
+        <property name="version" value="0.0.1" />
+        <property name="release_dir" value="build/release/${version}/" />
+        <mkdir dir="${release_dir}" />
+    </target>
+    
+    <target name="package-sources" description="archive the source and its dependencies" >
+	    <jar basedir="bin/" destfile="${release_dir}/${ant.project.name}-${version}-sources.jar">
+	    </jar>
+	</target>
+	
+	<target name="package-docs" description="generate the javadocs and package them into a jar" >
+	    <javadoc sourcepath="src/" destdir="doc/" />
+	    <jar compress="true" destfile="${release_dir}/${ant.project.name}-${version}-javadoc.jar" basedir="doc/" />
+	</target>
+	
+	<target name="package-all" 
+	        description="package sources and docs into single archive with README and LICENSE"
+	        depends="setup,package-sources,package-docs">
+	    
+	    <copy file="LICENSE" todir="${release_dir}"/>
+	    <copy file="README.md" todir="${release_dir}"/>
+	    <!-- TODO: Add changelog -->
+	    <zip basedir="${release_dir}" includes="**" destfile="${release_dir}/${ant.project.name}-${version}.zip"/>
+	</target>
+</project>
