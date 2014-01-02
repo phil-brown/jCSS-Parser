@@ -30,6 +30,11 @@ public class Token implements ParserConstants
 	public int tokenCode;
 	public String attribute;
 	
+	public Token(int tokenCode)
+	{
+		this(tokenCode, null);
+	}
+	
 	public Token(int tokenCode, String attribute)
 	{
 		this.tokenCode = tokenCode;
@@ -134,5 +139,32 @@ public class Token implements ParserConstants
 	        case EOF: return "\nEOF\n";
 	        default: return String.format(Locale.US, "%d  Unknown Character", tokenCode);
 		}
+	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if (o instanceof Token)
+		{
+			Token t = (Token) o;
+			if (t.tokenCode == tokenCode)
+			{
+				if (t.attribute == null)
+				{
+					if (attribute == null)
+						return true;
+					return false;
+				}
+				else if (attribute == null)
+					return false;
+				return t.attribute.equals(attribute);
+			}
+		}
+		return false;
+	}
+	
+	public boolean nequals(Object o)
+	{
+		return !equals(o);
 	}
 }
