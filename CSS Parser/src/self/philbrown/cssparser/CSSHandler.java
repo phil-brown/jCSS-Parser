@@ -42,7 +42,7 @@ public interface CSSHandler
 	 * @param importString the name of the file to input. This can be interpreted any way.
 	 * @return an {@code InputStream} associated with the given name, or {@code null}.
 	 */
-	public InputStream handleImport(String importString);
+	public InputStream handleImport(TokenSequence importSequence);
 	
 	/**
 	 * Alerts the listener that a {@literal @}charset At-Rule has been parsed and handled by the
@@ -64,7 +64,7 @@ public interface CSSHandler
 	 * @return {@code true} if the support block should be included (at the end of the CSS Input Stream).
 	 * Otherwise {@code false}.
 	 */
-	public boolean supports(String logic);
+	public boolean supports(TokenSequence logic);
 	
 	/**
 	 * Handle {@literal @}Keyframes At-Rule
@@ -78,6 +78,23 @@ public interface CSSHandler
 	 * @param font the FontFace that has been parsed.
 	 */
 	public void handleFontFace(FontFace font);
+	
+	/**
+	 * Query to see if the given media is supported. If so, the logic within will be appended
+	 * to the end of the css input stream
+	 * @param types a list of media types used for the media query
+	 * @return true if any of the the given media is supported
+	 */
+	public boolean queryMedia(TokenSequence[] types);
+	
+	/**
+	 * Handle the {@literal @}page At-Rule
+	 * @param pseudoClass the pseudo-class
+	 * @param properties the list of properties
+	 */
+	public void handlePage(TokenSequence pseudoClass, List<Declaration> properties);
+	
+	public boolean queryDocument(TokenSequence[] functions);
 	
 	/**
 	 * Called once the parser has completed.

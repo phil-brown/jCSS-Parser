@@ -20,24 +20,57 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 /**
- * 
+ * Tests the parser using a stylesheet string (derived from HTML5 boilerplate code)
  * @author Phil Brown
  * @since 2:39:59 PM Dec 18, 2013
  */
 public class Tester 
 {
-
+	/**
+	 * Run the test case
+	 * @param args
+	 */
 	public static void main(String[] args)
 	{
 		CSSHandler handler = new DefaultCSSHandler() {
 			@Override
-			public InputStream handleImport(String importString) {
-				System.out.println("Found @import " + importString);
+			public InputStream handleImport(TokenSequence importString) {
+				System.out.println("Found @import " + importString.toString());
 				return new ByteArrayInputStream(".foobar{height:100%}".getBytes());
 			}
 			
 			@Override
-			public boolean supports(String logic) {
+			public boolean supports(TokenSequence logic) {
+				return true;
+			}
+			
+			@Override
+			public boolean queryDocument(TokenSequence[] functions) {
+				StringBuilder builder = new StringBuilder("Found @document query for document functions: [ ");
+				for (int i = 0; i < functions.length; i++) 
+				{
+					builder.append(functions[i].toString());
+					if (i != functions.length-1)
+						builder.append(", ");
+					
+				}
+				builder.append(" ]");
+				System.out.println(builder.toString());
+				return true;
+			}
+			
+			@Override
+			public boolean queryMedia(TokenSequence[] types) {
+				StringBuilder builder = new StringBuilder("Found @media query for media types: [ ");
+				for (int i = 0; i < types.length; i++) 
+				{
+					builder.append(types[i].toString());
+					if (i != types.length-1)
+						builder.append(", ");
+					
+				}
+				builder.append(" ]");
+				System.out.println(builder.toString());
 				return true;
 			}
 		};
@@ -53,9 +86,13 @@ public class Tester
 		}
 	}
 	
+	/**
+	 * Creates an input stream from a CSS stylesheet string that includes test cases to run
+	 * @return an input stream to test
+	 */
 	private static InputStream getSampleInputStream()
 	{
-		String sample = "/*@charset ISO-8859-1;*/\n"+
+		String sample = "@charset ISO-8859-1;\n"+
 	    "@charset utf-8;\n"+
 	    "@import someFile.css;\n"+
 	    "@keyframes mymove\n"+
@@ -117,6 +154,20 @@ public class Tester
 		"::selection {\n" +
 		"    background: #b3d4fc;\n" +
 		"    text-shadow: none;\n" +
+		"}\n" +
+		"@document domain(example.com), url-prefix(http://www.example.com/test/) {\n" +
+		"    @page :first\n"+
+	    "    {\n"+
+	    "        margin:2in\n"+
+	    "    }\n"+
+	    "    #test>foo : { background: #00FF33 }\n" +
+		"}\n" +
+		"@media screen, print {\n" +
+		"    @page :last\n"+
+	    "    {\n"+
+	    "        margin:1in\n"+
+	    "    }\n"+
+	    "    a[src*=\"example\"] : { background: #FF0000 }\n" +
 		"}\n" +
 		"\n" +
 		"/*\n" +

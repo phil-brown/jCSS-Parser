@@ -34,8 +34,8 @@ public class DefaultCSSHandler implements CSSHandler
 	}
 
 	@Override
-	public InputStream handleImport(String importString) {
-		System.out.println("Found @import " + importString);
+	public InputStream handleImport(TokenSequence importString) {
+		System.out.println("Found @import " + importString.toString());
 		return null;
 	}
 	
@@ -50,8 +50,8 @@ public class DefaultCSSHandler implements CSSHandler
 	}
 
 	@Override
-	public boolean supports(String logic) {
-		System.out.println("Skipping support check for logic: " + logic);
+	public boolean supports(TokenSequence logic) {
+		System.out.println("Skipping support check for logic: " + logic.toString());
 		return false;
 	}
 
@@ -74,6 +74,47 @@ public class DefaultCSSHandler implements CSSHandler
 	@Override
 	public void handleRuleSet(RuleSet ruleSet) {
 		System.out.println("\n" + ruleSet.toString() + "\n");
+	}
+
+	@Override
+	public boolean queryMedia(TokenSequence[] types) {
+		StringBuilder builder = new StringBuilder("Skipping media query for media types: [ ");
+		for (int i = 0; i < types.length; i++) 
+		{
+			builder.append(types[i].toString());
+			if (i != types.length-1)
+				builder.append(", ");
+			
+		}
+		builder.append(" ]");
+		System.out.println(builder.toString());
+		return false;
+	}
+
+	@Override
+	public void handlePage(TokenSequence pseudoClass, List<Declaration> properties) {
+		StringBuilder builder = new StringBuilder(" {\n");
+		for (int i = 0; i < properties.size(); i++)
+		{
+			builder.append("  ").append(properties.get(i)).append(";\n");
+		}
+		builder.append("}");
+		System.out.println(" Found @page " + pseudoClass.toString() + builder.toString());
+	}
+
+	@Override
+	public boolean queryDocument(TokenSequence[] functions) {
+		StringBuilder builder = new StringBuilder("Skipping document query for document functions: [ ");
+		for (int i = 0; i < functions.length; i++) 
+		{
+			builder.append(functions[i].toString());
+			if (i != functions.length-1)
+				builder.append(", ");
+			
+		}
+		builder.append(" ]");
+		System.out.println(builder.toString());
+		return false;
 	}
 
 }

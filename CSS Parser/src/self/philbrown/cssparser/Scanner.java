@@ -55,7 +55,7 @@ public class Scanner implements ParserConstants
 	}
 	
 	/**
-	 * Handle {@literal @}support. Supported css is appended to the end of the css input.
+	 * Handle {@literal @}support. Supported css is appended to the end of the css input stream.
 	 * @param ruleSets
 	 * @throws IOException
 	 */
@@ -98,8 +98,9 @@ public class Scanner implements ParserConstants
 		//costly.
 		StringBuilder builder = new StringBuilder();
 		String read = source.readLine();
+		builder.append(C);//no
 		while(read != null) {
-		    //System.out.println(read);
+		    System.out.println(read);
 			builder.append(read);
 			read = source.readLine();
 		}
@@ -130,17 +131,27 @@ public class Scanner implements ParserConstants
 		
 		//costly.
 		StringBuilder builder = new StringBuilder();
+//		int lineNumber = line;
+//		while(C != EOFCHAR)
+//		{
+//			builder.append(nextToken(false).toString());
+//		}
+//		//builder.append(EOFCHAR);
+//		line = lineNumber;
 		String read = source.readLine();
-		while(read != null) {
-		    //System.out.println(read);
+		while(read != null) {//This messes up cursor?
 			builder.append(read);
 			read = source.readLine();
 		}
+		charInLine = 1;
 		source.close();
 	    String currentStreamContents = builder.toString();
 	    this.source = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(currentStreamContents.getBytes()), charset));
+	    cursor++;
+	    charInLine = 0;
+	    line++;
 	    //source.skip(cursor);
-		getChar();
+		//getChar();
 	}
 	
 	private void getChar() throws IOException
@@ -169,7 +180,6 @@ public class Scanner implements ParserConstants
 			//get through whitespace
 			while (Character.isWhitespace(C))
 			{
-				//System.out.println(String.valueOf(C));//FIXME remove this
 				getChar();
 			}
 		}
@@ -352,6 +362,10 @@ public class Scanner implements ParserConstants
 			case ' ' : {
 				getChar();
 				return new Token(SPACE, null);
+			}
+			case '"' : {
+				getChar();
+				return new Token(DOUBLE_QUOTE, null);
 			}
 			case EOFCHAR : {
 				return new Token(EOF, null);
