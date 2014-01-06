@@ -17,7 +17,7 @@
 package self.philbrown.cssparser;
 
 /**
- * 
+ * Contains Tokens and Reserved words that are used during parsing
  * @author Phil Brown
  * @since 2:39:59 PM Dec 18, 2013
  */
@@ -91,7 +91,8 @@ public interface ParserConstants
 			                DOUBLE_QUOTE = 136,
 			                AT_RULE = 137,
 			                PERCENT = 138,
-			                SPACE = 139;
+			                SPACE = 139,
+			                NULL = 140;
 
 	public static final char EOF = 1000;
 	public static final char EOFCHAR = (char)(-1);

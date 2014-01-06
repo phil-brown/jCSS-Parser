@@ -20,7 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 /**
- * Tests the parser using a stylesheet string (derived from HTML5 boilerplate code)
+ * Tests the parser using a stylesheet string, which is derived from HTML5 boilerplate css.
  * @author Phil Brown
  * @since 2:39:59 PM Dec 18, 2013
  */
@@ -49,7 +49,7 @@ public class Tester
 				StringBuilder builder = new StringBuilder("Found @document query for document functions: [ ");
 				for (int i = 0; i < functions.length; i++) 
 				{
-					builder.append(functions[i].toString());
+					builder.append(functions[i].toDebugString());
 					if (i != functions.length-1)
 						builder.append(", ");
 					
@@ -64,7 +64,7 @@ public class Tester
 				StringBuilder builder = new StringBuilder("Found @media query for media types: [ ");
 				for (int i = 0; i < types.length; i++) 
 				{
-					builder.append(types[i].toString());
+					builder.append(types[i].toDebugString());
 					if (i != types.length-1)
 						builder.append(", ");
 					
@@ -139,8 +139,8 @@ public class Tester
 		" */\n" +
 		"\n" +
 		"::-moz-selection {\n" +
-		"    background: #b3d4fc;\n" +
-		"    text-shadow: none;\n" +
+		"    background: #b3d4fc !important;\n" +
+		"    text-shadow: none ! important;\n" +
 		"}\n" +
 		"@supports (debug) {\n" +
 		"    @keyframes mySupportMove\n"+
@@ -156,9 +156,8 @@ public class Tester
 		"    text-shadow: none;\n" +
 		"}\n" +
 		"@document domain(example.com), url-prefix(http://www.example.com/test/) {\n" +
-		"    @page :first\n"+
-	    "    {\n"+
-	    "        margin:2in\n"+
+		"    @media screen {\n"+
+		"        vertical-align: middle;\n" +
 	    "    }\n"+
 	    "    #test>foo : { background: #00FF33 }\n" +
 		"}\n" +

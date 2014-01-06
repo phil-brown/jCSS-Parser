@@ -21,19 +21,30 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * 
+ * Used with {@literal @}Keyframe At-Rules to specify what declarations are modified for a given 
+ * percentage of an animation
  * @author Phil Brown
  * @since 2:39:59 PM Dec 18, 2013
  */
 public class KeyFrame {
 
+	/** The percent of the animation at which the values in the decalaration block should be set. */
 	private double percent;
+	/** The list of properties and their values that will be changed at the given percentage time */
 	private List<Declaration> declarationBlock;
 	
+	/**
+	 * Default constructor 
+	 */
 	public KeyFrame()
 	{
 		declarationBlock = new ArrayList<Declaration>();
 	}
+	/**
+	 * Constructor
+	 * @param percent
+	 * @param declarationBlock
+	 */
 	public KeyFrame(double percent, List<Declaration> declarationBlock)
 	{
 		this.percent = percent;

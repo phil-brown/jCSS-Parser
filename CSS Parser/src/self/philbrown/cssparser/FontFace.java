@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public class FontFace implements ParserConstants
 {
-
+	/** Specifies how to strech or condense the font */
 	public static enum FontStretch
 	{
 		normal,
@@ -44,6 +44,7 @@ public class FontFace implements ParserConstants
 		semi_expanded
 	}
 	
+	/** Specifies the font style */
 	public static enum FontStyle
 	{
 		normal,
@@ -51,20 +52,36 @@ public class FontFace implements ParserConstants
 		oblique
 	}
 	
+	/** Normal font weight */
 	public static final int FONT_WEIGHT_NORMAL = 0;
+	/** bold font weight */
 	public static final int FONT_WEIGHT_BOLD = 1;
 	
+	/** Font Family */
 	private String fontFamily;
 	
+	/** Specifies how to stretch or condense the font */
 	private FontStretch stretch = FontStretch.normal;
 	
+	/** Normal, italic, or oblique */
 	private FontStyle style = FontStyle.normal;
 	
+	/** 
+	 * Specifies the font weight.
+	 * @see #FONT_WEIGHT_NORMAL
+	 * @see #FONT_WEIGHT_BOLD
+	 */
 	private int fontWeight = FONT_WEIGHT_NORMAL;
 	
+	/**
+	 * Unicode range
+	 */
 	private String unicodeRange = "U+0-10FFFF";
 	
-	private Scanner scanner;//needs access to lineSeparator
+	/**
+	 * Provides access to the scanner, in order to get the line separator character
+	 */
+	private Scanner scanner;
 	
 	/**
 	 * Maps function name to a list of resources. This is useful so that there can be multiple resources
@@ -92,6 +109,13 @@ public class FontFace implements ParserConstants
 		this.scanner = s;
 	}
 	
+	/**
+	 * Used to ensure the proper syntax is used
+	 * @param t
+	 * @param matcher
+	 * @return
+	 * @throws Exception
+	 */
 	private boolean match(Token t, int matcher) throws Exception
 	{
 		if (t.tokenCode == matcher)
@@ -100,7 +124,7 @@ public class FontFace implements ParserConstants
 	}
 	
 	/**
-	 * 
+	 * Constructor
 	 * @param declarationBlock
 	 * @throws Exception if the declarations are not correctly formatted.
 	 */

@@ -26,15 +26,29 @@ import java.util.Locale;
  */
 public class Token implements ParserConstants
 {
-
+	/** 
+	 * Specifies the Token type.
+	 */
 	public int tokenCode;
+	/**
+	 * Specifies the Token value. May be {@code null}.
+	 */
 	public String attribute;
 	
+	/**
+	 * Simple Constructor. Use for Tokens that do not require an {@link #attribute}.
+	 * @param tokenCode Specifies the token using a constant value
+	 */
 	public Token(int tokenCode)
 	{
 		this(tokenCode, null);
 	}
 	
+	/**
+	 * Constructor
+	 * @param tokenCode Specifies the token using a constant value
+	 * @param attribute Specifies the value. Used for at-rules, identifiers, reserved words, etc
+	 */
 	public Token(int tokenCode, String attribute)
 	{
 		this.tokenCode = tokenCode;
@@ -84,9 +98,10 @@ public class Token implements ParserConstants
 			case DOUBLE_COLON : return "::";
 			case SINGLE_QUOTE : return "'";
 			case DOUBLE_QUOTE : return "\"";
-			case AT_RULE : return text;
+			case AT_RULE : return "@" + text;
 			case PERCENT : return "%";
 			case SPACE : return " ";
+			case NULL : return "";
 	        case EOF: return "\nEOF\n";
 	        default: return String.format(Locale.US, "%d  Unknown Character", tokenCode);
 		}
@@ -133,9 +148,10 @@ public class Token implements ParserConstants
 			case DOUBLE_COLON : return "::";
 			case SINGLE_QUOTE : return "'";
 			case DOUBLE_QUOTE : return "\"";
-			case AT_RULE : return (attribute == null ? "[AT RULE]" : attribute);
+			case AT_RULE : return (attribute == null ? "[AT RULE]" : "@" + attribute);
 			case PERCENT : return "%";
 			case SPACE : return " ";
+			case NULL : return "[NULL]";
 	        case EOF: return "\nEOF\n";
 	        default: return String.format(Locale.US, "%d  Unknown Character", tokenCode);
 		}
@@ -163,6 +179,11 @@ public class Token implements ParserConstants
 		return false;
 	}
 	
+	/**
+	 * Not-Equals shortcut method
+	 * @param o
+	 * @return
+	 */
 	public boolean nequals(Object o)
 	{
 		return !equals(o);

@@ -32,16 +32,27 @@ import java.util.Vector;
  */
 public class TokenSequence implements Iterable<Token>
 {
-
+	/** The tokens in the sequence */
 	private List<Token> tokens;
+	/** The sequence as a string */
 	private String string;
 	
+	/**
+	 * Constructor
+	 * @param tokens
+	 * @param string
+	 */
 	public TokenSequence(List<Token> tokens, String string)
 	{
 		this.tokens = tokens;
 		this.string = string;
 	}
 	
+	/**
+	 * Constructor
+	 * @param token
+	 * @param string
+	 */
 	public TokenSequence(Token token, String string)
 	{
 		this.tokens = new ArrayList<Token>();
@@ -49,6 +60,12 @@ public class TokenSequence implements Iterable<Token>
 		this.string = string;
 	}
 	
+	/**
+	 * Create a TokenSequence from a String
+	 * @param s
+	 * @return
+	 * @throws IOException
+	 */
 	public static TokenSequence parse(String s) throws IOException
 	{
 		Scanner scanner = new Scanner(new ByteArrayInputStream(s.getBytes()));
@@ -62,16 +79,28 @@ public class TokenSequence implements Iterable<Token>
 		return builder.create();
 	}
 	
+	/**
+	 * Gets the length of the TokenSequence
+	 * @return
+	 */
 	public int length()
 	{
 		return tokens.size();
 	}
 	
+	/**
+	 * Gets the tokens in the sequence
+	 * @return
+	 */
 	public List<Token> getTokens()
 	{
 		return tokens;
 	}
 	
+	/**
+	 * Get the tokens as an enumeration
+	 * @return
+	 */
 	public Enumeration<Token> enumerate()
 	{
 		Vector<Token> vector = new Vector<Token>();
@@ -82,6 +111,11 @@ public class TokenSequence implements Iterable<Token>
 		return vector.elements();
 	}
 	
+	/**
+	 * Get a subsequence of the TokenSequence
+	 * @param start
+	 * @return
+	 */
 	public TokenSequence subSequence(int start)
 	{
 		Builder b = new Builder();
@@ -97,6 +131,12 @@ public class TokenSequence implements Iterable<Token>
 		return b.create();
 	}
 	
+	/**
+	 * Get a subSequence of the TokenSequence
+	 * @param start
+	 * @param end
+	 * @return
+	 */
 	public TokenSequence subSequence(int start, int end)
 	{
 		Builder b = new Builder();
@@ -118,6 +158,16 @@ public class TokenSequence implements Iterable<Token>
 	public String toString()
 	{
 		return string;
+	}
+	
+	public String toDebugString()
+	{
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < tokens.size(); i++)
+		{
+			builder.append(tokens.get(i).toDebugString());
+		}
+		return builder.toString();
 	}
 	
 	@Override
@@ -150,6 +200,11 @@ public class TokenSequence implements Iterable<Token>
 		return false;
 	}
 	
+	/**
+	 * Not Equals
+	 * @param o
+	 * @return
+	 */
 	public boolean nequals(Object o)
 	{
 		return !equals(o);
@@ -185,6 +240,12 @@ System.out.println("subSequence(0," + seq.length() + " = " + sub);//TODO remove 
 		return false;
 	}
 	
+	/**
+	 * Splits the string on any of the given Tokens. This is useful, for example, when splitting 
+	 * on either {@link ParserConstants#COLON} or {@link ParserConstants#DOUBLE_COLON}.
+	 * @param t
+	 * @return
+	 */
 	public TokenSequence[] splitOnAny(Token[] t)
 	{
 		List<TokenSequence> list = new ArrayList<TokenSequence>();
@@ -215,6 +276,11 @@ System.out.println("subSequence(0," + seq.length() + " = " + sub);//TODO remove 
 		return array;
 	}
 	
+	/**
+	 * Split the sequence on a given token
+	 * @param t
+	 * @return
+	 */
 	public TokenSequence[] split(Token t)
 	{
 		List<TokenSequence> list = new ArrayList<TokenSequence>();
@@ -283,17 +349,31 @@ System.out.println("subSequence(0," + seq.length() + " = " + sub);//TODO remove 
 		return tokens.iterator();
 	}
 	
+	/**
+	 * Helper class for creating a TokenSequence
+	 * @author Phil Brown
+	 * @since 1:37:05 PM Jan 6, 2014
+	 *
+	 */
 	public static class Builder
 	{
 		List<Token> tokens;
 		StringBuilder builder;
 		
+		/**
+		 * Constructor
+		 */
 		public Builder()
 		{
 			tokens = new ArrayList<Token>();
 			builder = new StringBuilder();
 		}
 		
+		/**
+		 * Append a token
+		 * @param t
+		 * @return
+		 */
 		public Builder append(Token t)
 		{
 			tokens.add(t);
@@ -301,6 +381,11 @@ System.out.println("subSequence(0," + seq.length() + " = " + sub);//TODO remove 
 			return this;
 		}
 		
+		/**
+		 * Append a TokenSequence
+		 * @param t
+		 * @return
+		 */
 		public Builder append(TokenSequence t)
 		{
 			for (int i = 0; i < t.length(); i++)
@@ -313,11 +398,18 @@ System.out.println("subSequence(0," + seq.length() + " = " + sub);//TODO remove 
 			return this;
 		}
 		
+		/**
+		 * Create the sequence
+		 * @return
+		 */
 		public TokenSequence create()
 		{
 			return new TokenSequence(tokens, builder.toString());
 		}
 		
+		/**
+		 * Reset
+		 */
 		public void clear()
 		{
 			tokens.clear();

@@ -28,21 +28,34 @@ import java.util.Locale;
  */
 public class RuleSet
 {
-
+	/** Selector */
 	private TokenSequence selector;
+	/** List of Property-Value pairings */
 	private List<Declaration> declarationBlock;
 	
+	/**
+	 * Constructor
+	 */
 	public RuleSet()
 	{
 		declarationBlock = new ArrayList<Declaration>();
 	}
 	
+	/**
+	 * Constructor
+	 * @param selector
+	 */
 	public RuleSet(TokenSequence selector)
 	{
 		this();
 		this.selector = selector;
 	}
 	
+	/**
+	 * Constructor
+	 * @param selector
+	 * @param declarationBlock
+	 */
 	public RuleSet(TokenSequence selector, List<Declaration> declarationBlock)
 	{
 		this.selector = selector;

@@ -34,6 +34,8 @@ public class CSSParser implements ParserConstants
 	private Scanner s;
 	/** The current {@code Token}. */
 	private Token t;
+	/** The previous {@code Token}. */
+	private Token previous = new Token(NULL);
 	
 	/** Used to respond to stream parsing events. */
 	private CSSHandler handler;
@@ -73,10 +75,11 @@ public class CSSParser implements ParserConstants
 				}
 				System.out.print(t.toDebugString());
 			}
+			previous = t;
 			t = s.nextToken();
 		}
 		else {
-			handler.handleError(String.format(Locale.US, "Match Error at line %d and character %d. Need: %s Found: %s", s.getLineNumber(), s.getCharacterNumberForCurrentLine(), new Token(matcher, null).toDebugString(), t.toString()), new Exception("Matcher Error"));
+			handler.handleError(String.format(Locale.US, "Match Error at line %d and character %d. Need: %s Found: %s. Previous Token is %s.", s.getLineNumber(), s.getCharacterNumberForCurrentLine(), new Token(matcher, null).toDebugString(), t.toString(), previous.toDebugString()), new Exception("Matcher Error"));
 			System.exit(0);
 		}
 	}
@@ -167,7 +170,7 @@ public class CSSParser implements ParserConstants
 							
 							if (t.tokenCode == AT_RULE)
 							{
-								newLogic.append("@").append(t.toString()).append(" ");
+								newLogic.append(t.toString()).append(" ");
 							}
 							else
 							{
@@ -330,7 +333,7 @@ public class CSSParser implements ParserConstants
 							
 							if (t.tokenCode == AT_RULE)
 							{
-								newLogic.append("@").append(t.toString()).append(" ");
+								newLogic.append(t.toString()).append(" ");
 							}
 							else
 							{
@@ -419,7 +422,7 @@ public class CSSParser implements ParserConstants
 							
 							if (t.tokenCode == AT_RULE)
 							{
-								newLogic.append("@").append(t.toString()).append(" ");
+								newLogic.append(t.toString()).append(" ");
 							}
 							else
 							{
@@ -498,10 +501,18 @@ public class CSSParser implements ParserConstants
 		
 	}
 	
+	/**
+	 * Get the character used as line separator by the scanner
+	 * @return the character used by the scanner for counting lines
+	 */
 	public char getLineSeparator() {
 		return s.getLineSeparator();
 	}
 
+	/**
+	 * Set the character used by the scanner to denote a new line
+	 * @param lineSeparator the character that the scanner should recognize as a new line
+	 */
 	public void setLineSeparator(char lineSeparator) {
 		s.setLineSeparator(lineSeparator);
 	}
@@ -515,26 +526,5 @@ public class CSSParser implements ParserConstants
 		debug = true;
 		parse();
 	}
-	
-//	private void enter(String s)
-//	{
-//		indent++;
-//		for (int i = 0; i < indent; i++)
-//		{
-//			System.out.print(" ");
-//		}
-//		System.out.println(s + ">>");
-//	}
-//	
-//	private void exit(String s)
-//	{
-//		indent--;
-//		for (int i = 0; i < indent; i++)
-//		{
-//			System.out.print(" ");
-//		}
-//		System.out.println("<<" + s);
-//	}
-	
 	
 }

@@ -26,26 +26,45 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * 
+ * Scans the input stream for CSS syntax. Each Object that is a CSS component is recognized as a Token
+ * and is handled by the {@link CSSParser parser}.
  * @author Phil Brown
  * @since 2:39:59 PM Dec 18, 2013
  */
 public class Scanner implements ParserConstants 
 {
-
-	private String charset = "UTF-8";//default
+	/** Default charset */
+	private String charset = "UTF-8";
+	/** The current character that has been read by the buffer */
 	private char C;
+	/** Input stream reader */
 	private BufferedReader source;
+	
+	//note that cursor, charInLine, and line may get thrown off by some at-rules that modify the input stream
+	
+	/** Used to remember the current index while reading through the input source. */
 	private int cursor = 0;
+	/** Used to note which on character in the current line an error has occured. */
 	private int charInLine = 0;
+	/** Keeps track of which line is being parsed. */
 	private int line = 1;
+	
+	/** Keeps track of imports so no redundant calls are made */
 	private List<String> imports = new ArrayList<String>();
+	/** Keeps track of supports statements so no redundant calls are made */
 	private List<String> supports = new ArrayList<String>();
 	
+	/** The input stream */
 	private InputStream is;
 	
+	/** character that is used as a line delimeter. this is used for counting lines are characters in lines. */
 	private char lineSeparator = Character.LINE_SEPARATOR;
 	
+	/**
+	 * Constructor
+	 * @param source
+	 * @throws IOException
+	 */
 	public Scanner(InputStream source) throws IOException
 	{
 		this.is = source;
@@ -55,7 +74,7 @@ public class Scanner implements ParserConstants
 	}
 	
 	/**
-	 * Handle {@literal @}support. Supported css is appended to the end of the css input stream.
+	 * Append CSS to the end of the current css input stream.
 	 * @param ruleSets
 	 * @throws IOException
 	 */
@@ -75,8 +94,8 @@ public class Scanner implements ParserConstants
 		source.close();
 	    String currentStreamContents = builder.toString();
 	    
-	    this.is = new ByteArrayInputStream(String.format(Locale.US, "%s%s", currentStreamContents,ruleSets).getBytes());
-		this.source = new BufferedReader(new InputStreamReader(is, charset));
+	    this.is = new ByteArrayInputStream(String.format(Locale.US, "%s %s", currentStreamContents,ruleSets).getBytes());
+	    this.source = new BufferedReader(new InputStreamReader(is, charset));
 		//getChar();
 	}
 	
@@ -131,13 +150,6 @@ public class Scanner implements ParserConstants
 		
 		//costly.
 		StringBuilder builder = new StringBuilder();
-//		int lineNumber = line;
-//		while(C != EOFCHAR)
-//		{
-//			builder.append(nextToken(false).toString());
-//		}
-//		//builder.append(EOFCHAR);
-//		line = lineNumber;
 		String read = source.readLine();
 		while(read != null) {//This messes up cursor?
 			builder.append(read);
@@ -150,10 +162,12 @@ public class Scanner implements ParserConstants
 	    cursor++;
 	    charInLine = 0;
 	    line++;
-	    //source.skip(cursor);
-		//getChar();
 	}
 	
+	/**
+	 * Read the next character from the input stream
+	 * @throws IOException
+	 */
 	private void getChar() throws IOException
 	{
 		C = (char) source.read();
@@ -166,11 +180,22 @@ public class Scanner implements ParserConstants
 		}
 	}
 	
+	/**
+	 * Read the next token from the input stream
+	 * @return
+	 * @throws IOException
+	 */
 	public Token nextToken() throws IOException
 	{
 		return nextToken(true);
 	}
 	
+	/**
+	 * Read the next token from the input stream
+	 * @param ignoreWhitespace {@code true} to ignore whitespace, otherwise {@code false}
+	 * @return
+	 * @throws IOException
+	 */
 	public Token nextToken(boolean ignoreWhitespace) throws IOException
 	{
 		String attribute = "";
@@ -232,7 +257,7 @@ public class Scanner implements ParserConstants
 						}
 					}
 					getChar();
-					return new Token(COMMENT, attribute);
+					return nextToken(ignoreWhitespace);//new Token(COMMENT, attribute);
 				}
 				return new Token(SLASH, null);
 			}
@@ -378,6 +403,11 @@ public class Scanner implements ParserConstants
 		}
 	}
 	
+	/**
+	 * Get the Token for reserved word or identifier
+	 * @param word
+	 * @return
+	 */
 	private int lookup(String word)
 	{
 		for (int i = 1; i < RESERVEDWORD.length; i++) 
@@ -388,25 +418,45 @@ public class Scanner implements ParserConstants
 		return IDENTIFIER;
 	}
 	
+	/**
+	 * Get the current line number of the scanner
+	 * @return
+	 */
 	public int getLineNumber()
 	{
-		return line;//FIXME not working.
+		return line;
 	}
 	
+	/**
+	 * Get the current character number of the scanner
+	 * @return
+	 */
 	public int getCharacterNumber()
 	{
 		return cursor+1;
 	}
 	
+	/**
+	 * Get the current character number for the current line that is being scanned
+	 * @return
+	 */
 	public int getCharacterNumberForCurrentLine()
 	{
 		return charInLine+1;
 	}
 
+	/**
+	 * Get the line delimiter character
+	 * @return
+	 */
 	public char getLineSeparator() {
 		return lineSeparator;
 	}
-
+	
+	/**
+	 * Set the line delimiter character
+	 * @param lineSeparator
+	 */
 	public void setLineSeparator(char lineSeparator) {
 		this.lineSeparator = lineSeparator;
 	}
