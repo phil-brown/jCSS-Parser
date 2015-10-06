@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package self.philbrown.cssparser;
+package io.github.phdbrown.cssparser;
 
 import java.util.Locale;
 
