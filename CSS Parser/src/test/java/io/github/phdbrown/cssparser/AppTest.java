@@ -1,40 +1,51 @@
-/*
- * Copyright 2013 Phil Brown
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package io.github.phdbrown.cssparser;
 
-package self.philbrown.cssparser;
+import io.github.phdbrown.cssparser.CSSHandler;
+import io.github.phdbrown.cssparser.CSSParser;
+import io.github.phdbrown.cssparser.DefaultCSSHandler;
+import io.github.phdbrown.cssparser.TokenSequence;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 /**
- * Tests the parser using a stylesheet string, which is derived from HTML5 boilerplate css.
- * @author Phil Brown
- * @since 2:39:59 PM Dec 18, 2013
+ * Unit test for simple App.
  */
-public class Tester 
+public class AppTest 
+    extends TestCase
 {
-	/**
-	 * Run the test case
-	 * @param args
-	 */
-	public static void main(String[] args)
-	{
-		CSSHandler handler = new DefaultCSSHandler() {
+    /**
+     * Create the test case
+     *
+     * @param testName name of the test case
+     */
+    public AppTest( String testName )
+    {
+        super( testName );
+    }
+
+    /**
+     * @return the suite of tests being tested
+     */
+    public static Test suite()
+    {
+        return new TestSuite( AppTest.class );
+    }
+
+    /**
+     * Rigourous Test :-)
+     */
+    public void testApp()
+    {
+        assertTrue( true );
+        CSSHandler handler = new DefaultCSSHandler() {
 			@Override
 			public InputStream handleImport(TokenSequence importString) {
 				System.out.println("Found @import " + importString.toString());
@@ -90,9 +101,9 @@ public class Tester
 		{
 			e.printStackTrace();
 		}
-	}
-	
-	/**
+    }
+    
+    /**
 	 * Creates an input stream from a CSS stylesheet string that includes test cases to run
 	 * @return an input stream to test
 	 */

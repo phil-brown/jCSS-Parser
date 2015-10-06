@@ -1,4 +1,4 @@
-package self.philbrown.cssparser;
+package io.github.phdbrown.cssparser;
 
 /**
  * Hello world!
