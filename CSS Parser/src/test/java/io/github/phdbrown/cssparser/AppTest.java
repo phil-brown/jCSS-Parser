@@ -6,10 +6,7 @@ import io.github.phdbrown.cssparser.DefaultCSSHandler;
 import io.github.phdbrown.cssparser.TokenSequence;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
-
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -40,11 +37,10 @@ public class AppTest
     }
 
     /**
-     * Rigourous Test :-)
+     * Simple Test... More to come.
      */
-    public void testApp()
+    public void testApp() throws Exception
     {
-        assertTrue( true );
         CSSHandler handler = new DefaultCSSHandler() {
 			@Override
 			public InputStream handleImport(TokenSequence importString) {
@@ -87,20 +83,9 @@ public class AppTest
 				return true;
 			}
 		};
-		try
-		{
-			CSSParser parser = new CSSParser(getSampleInputStream(), handler);
-			parser.setLineSeparator('\n');
-			parser.parse();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		catch (ParseException e) 
-		{
-			e.printStackTrace();
-		}
+		CSSParser parser = new CSSParser(getSampleInputStream(), handler);
+		parser.setLineSeparator('\n');
+		parser.parse();
     }
     
     /**
